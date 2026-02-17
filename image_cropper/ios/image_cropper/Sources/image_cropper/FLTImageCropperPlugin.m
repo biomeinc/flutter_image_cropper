@@ -12,6 +12,7 @@
     NSDictionary *_arguments;
     float _compressQuality;
     NSString *_compressFormat;
+    CGSize _originalSize;
 }
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
@@ -35,6 +36,7 @@
         BOOL embedInNavigationController = call.arguments[@"ios.embed_in_navigation_controller"];
 
         UIImage *image = [UIImage imageWithContentsOfFile:sourcePath];
+        _originalSize = image.size;
         TOCropViewController *cropViewController;
 
         if ([@"circle" isEqualToString:cropStyle]) {
@@ -224,6 +226,18 @@
 
 - (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
 {
+    CGSize angleOriginalSize = _originalSize;
+    if (angle == -90 || angle == 90 || angle == -270 || angle == 270) {
+        angleOriginalSize = CGSizeMake(_originalSize.height, _originalSize.width);
+    }
+
+    BOOL isOutOfBounds = CGRectGetMaxX(cropRect) > angleOriginalSize.width
+        || CGRectGetMaxY(cropRect) > angleOriginalSize.height;
+    if (isOutOfBounds) {
+        [self showOutOfBoundsAlertInCropViewController:cropViewController];
+        return;
+    }
+
     image = [self normalizedImage:image];
 
     NSNumber *maxWidth = [_arguments objectForKey:@"max_width"];
@@ -262,6 +276,7 @@
 
         _result = nil;
         _arguments = nil;
+        _originalSize = CGSizeZero;
     }
 }
 
@@ -271,6 +286,22 @@
 
     _result = nil;
     _arguments = nil;
+    _originalSize = CGSizeZero;
+}
+
+- (void)showOutOfBoundsAlertInCropViewController:(TOCropViewController *)cropViewController {
+    UIAlertController *alertController = [UIAlertController
+        alertControllerWithTitle:@"Check the Photo"
+                         message:@"The image is not fully inside the frame. Please move it and try again."
+                  preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                       style:UIAlertActionStyleDefault
+                                                     handler:^(__unused UIAlertAction *action) {
+        cropViewController.toolbar.doneTextButton.enabled = YES;
+        cropViewController.toolbar.doneIconButton.enabled = YES;
+    }];
+    [alertController addAction:okAction];
+    [cropViewController presentViewController:alertController animated:YES completion:nil];
 }
 
 // The way we save images to the tmp dir currently throws away all EXIF data
