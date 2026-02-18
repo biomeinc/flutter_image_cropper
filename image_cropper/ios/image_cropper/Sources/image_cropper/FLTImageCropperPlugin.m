@@ -290,11 +290,28 @@
 }
 
 - (void)showOutOfBoundsAlertInCropViewController:(TOCropViewController *)cropViewController {
+    NSString *alertTitle = @"Check the Photo";
+    NSString *alertMessage = @"The image is not fully inside the frame. Please move it and try again.";
+    NSString *okText = @"OK";
+
+    NSString *customAlertTitle = _arguments[@"ios.out_of_bounds_alert_title"];
+    NSString *customAlertMessage = _arguments[@"ios.out_of_bounds_alert_message"];
+    NSString *customAlertOkText = _arguments[@"ios.out_of_bounds_alert_ok_text"];
+    if (customAlertTitle && [customAlertTitle isKindOfClass:[NSString class]] && customAlertTitle.length > 0) {
+        alertTitle = customAlertTitle;
+    }
+    if (customAlertMessage && [customAlertMessage isKindOfClass:[NSString class]] && customAlertMessage.length > 0) {
+        alertMessage = customAlertMessage;
+    }
+    if (customAlertOkText && [customAlertOkText isKindOfClass:[NSString class]] && customAlertOkText.length > 0) {
+        okText = customAlertOkText;
+    }
+
     UIAlertController *alertController = [UIAlertController
-        alertControllerWithTitle:@"Check the Photo"
-                         message:@"The image is not fully inside the frame. Please move it and try again."
+        alertControllerWithTitle:alertTitle
+                         message:alertMessage
                   preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:okText
                                                        style:UIAlertActionStyleDefault
                                                      handler:^(__unused UIAlertAction *action) {
         cropViewController.toolbar.doneTextButton.enabled = YES;

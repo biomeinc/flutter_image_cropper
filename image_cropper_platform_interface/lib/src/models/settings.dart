@@ -363,6 +363,15 @@ class IOSUiSettings extends PlatformUiSettings {
   /// Setting this will override the Default which is a localized string for "Cancel".
   final String? cancelButtonTitle;
 
+  /// Alert title shown when crop area exceeds the original image bounds on iOS.
+  final String? outOfBoundsAlertTitle;
+
+  /// Alert message shown when crop area exceeds the original image bounds on iOS.
+  final String? outOfBoundsAlertMessage;
+
+  /// Alert OK button title shown when crop area exceeds bounds on iOS.
+  final String? outOfBoundsAlertOkText;
+
   /// controls the style of crop bounds, it can be rectangle or
   /// circle style (default is [CropStyle.rectangle]).
   final CropStyle cropStyle;
@@ -390,6 +399,9 @@ class IOSUiSettings extends PlatformUiSettings {
     this.title,
     this.doneButtonTitle,
     this.cancelButtonTitle,
+    this.outOfBoundsAlertTitle,
+    this.outOfBoundsAlertMessage,
+    this.outOfBoundsAlertOkText,
     this.cropStyle = CropStyle.rectangle,
     this.aspectRatioPresets = const [
       CropAspectRatioPreset.original,
@@ -424,6 +436,9 @@ class IOSUiSettings extends PlatformUiSettings {
         'ios.title': this.title,
         'ios.done_button_title': this.doneButtonTitle,
         'ios.cancel_button_title': this.cancelButtonTitle,
+        'ios.out_of_bounds_alert_title': this.outOfBoundsAlertTitle,
+        'ios.out_of_bounds_alert_message': this.outOfBoundsAlertMessage,
+        'ios.out_of_bounds_alert_ok_text': this.outOfBoundsAlertOkText,
         'ios.crop_style': this.cropStyle.name,
         'ios.aspect_ratio_presets': aspectRatioPresets
             .map<Map<String, dynamic>>((item) => {
